@@ -1,5 +1,5 @@
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
-echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] http://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install elasticsearch -y
@@ -11,7 +11,6 @@ read -s -n 1
 # /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
-echo "discovery.type: single-node" | sudo tee -a /etc/elasticsearch/elasticsearch.yml &>/dev/null
 
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch
