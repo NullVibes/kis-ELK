@@ -4,6 +4,10 @@ echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] artifacts.elastic.co/packa
 sudo apt update && sudo apt upgrade -y
 sudo apt install elasticsearch -y
 
+echo ""
+echo "Press any key to continue..."
+read -s -n 1
+
 # /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
@@ -15,15 +19,19 @@ sudo systemctl start elasticsearch
 
 # Elasticsearch Install Test
 curl -X GET "localhost:9200"
+echo ""
+echo "Press any key to continue..."
+read -s -n 1
+
 
 sudo apt install kibana -y
-
 # /etc/kibana/kibana.yml
-sudo mv /etc/kibana/kibana.yml /etc/kibana/kibana.yml.bak
-echo "server.port: 5601" | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
-echo "server.host: 0.0.0.0" | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
-echo 'elasticsearch.hosts: ["http://localhost:9200"]' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
-
+sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
+sudo sed -i 's/#server.host: 192.168.0.1/server.host: 0.0.0.0/' /etc/kibana/kibana.yml
+sudo sed -i 'elasticsearch.hosts: ["http://localhost:9200"]' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
+echo ""
+echo "Press any key to continue..."
+read -s -n 1
 
 sudo apt install logstash -y
 # /etc/logstash/conf.d/30-elasticsearch-output.conf
@@ -48,12 +56,14 @@ echo 'output {
       index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY-MM-dd}"
       }
     }
-  }' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
+  }' | sudo tee -a /etc/logstash/conf.d/30-elasticsearch-output.yml &>/dev/null
 
 sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstash -t
 sudo systemctl enable logstash
 sudo systemctl start logstash
-
+echo ""
+echo "Press any key to continue..."
+read -s -n 1
 
 sudo apt install filebeat -y
 # SED/AWK
