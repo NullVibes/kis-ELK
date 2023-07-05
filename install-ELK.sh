@@ -65,6 +65,10 @@ sudo apt install filebeat -y
 # #output.elasticsearch:
 # output.logstash:
 # #hosts: ["localhost:9200"]
+sudo sed -i 's/#output.logstash:/output.logstash:/' /etc/filebeat/filebeat.yml
+sudo sed -i 's/#hosts: ["localhost:5044"]/hosts: ["localhost:5044"]/' /etc/filebeat/filebeat.yml
+sudo sed -i 's/output.elasticsearch:/#output.elasticsearch:' /etc/filebeat/filebeat.yml
+sudo sed -i 's/hosts: ["localhost:9200"]/#hosts: ["localhost:9200"]/' /etc/filebeat/filebeat.yml
 sudo filebeat modules enable system
 sudo filebeat setup --pipelines --modules system
 sudo filebeat setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
