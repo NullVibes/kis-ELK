@@ -19,15 +19,23 @@ sudo systemctl start elasticsearch
 # Elasticsearch Install Test
 curl -X GET "localhost:9200"
 
-sudo apt install kibana logstash -y
+sudo apt install kibana -y
 
 # /etc/kibana/kibana.yml
 sudo mv /etc/kibana/kibana.yml /etc/kibana/kibana.yml.bak
-echo "server.port: 5601" | sudo tee -a /etc/kibana/kibana.yml
-echo "server.host: 0.0.0.0" | sudo tee -a /etc/kibana/kibana.yml
-echo 'elasticsearch.hosts: ["http://localhost:9200"]' | sudo tee -a /etc/kibana/kibana.yml
+echo "server.port: 5601" | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
+echo "server.host: 0.0.0.0" | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
+echo 'elasticsearch.hosts: ["http://localhost:9200"]' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
 
+
+sudo apt install logstash -y
 # /etc/logstash/conf.d/30-elasticsearch-output.conf
+echo 'input {
+  beats {
+    port => 5044
+    }
+  }' | sudo tee /etc/logstash/conf.d/02-beats-input.conf &>/dev/null
+
 echo 'output {
   if [@metadata][pipeline] {
     elasticsearch {
@@ -43,6 +51,23 @@ echo 'output {
       index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY-MM-dd}"
       }
     }
-  }' | sudo tee /etc/kibana/kibana.yml
+  }' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
 
-  
+sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstash -t
+sudo systemctl enable logstash
+sudo systemctl start logstash
+
+
+sudo apt install filebeat -y
+# SED/AWK
+# /etc/filebeat/filebeat.yml
+# hosts: ["localhost:5044"]
+# #output.elasticsearch:
+# output.logstash:
+# #hosts: ["localhost:9200"]
+sudo filebeat modules enable system
+sudo filebeat setup --pipelines --modules system
+sudo filebeat setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+sudo filebeat setup -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]' -E setup.kibana.host=localhost:5601
+sudo filebeat modules enable system
+sudo systemctl enable filebeat
