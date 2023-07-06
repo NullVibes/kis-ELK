@@ -55,7 +55,7 @@ echo 'output {
       index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY-MM-dd}"
       }
     }
-  }' | sudo tee -a /etc/logstash/conf.d/30-elasticsearch-output.yml &>/dev/null
+  }' | sudo tee /etc/logstash/conf.d/30-elasticsearch-output.yml &>/dev/null
 
 sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstash -t
 sudo systemctl enable logstash
