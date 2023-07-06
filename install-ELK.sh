@@ -27,7 +27,7 @@ sudo apt install kibana -y
 # /etc/kibana/kibana.yml
 sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
 sudo sed -i 's/#server.host: 192.168.0.1/server.host: 0.0.0.0/' /etc/kibana/kibana.yml
-sudo sed -i 'elasticsearch.hosts: ["http://localhost:9200"]' | sudo tee -a /etc/kibana/kibana.yml &>/dev/null
+sudo sed -i 's/#elasticsearch.hosts: ["http://localhost:9200"]/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml &>/dev/null
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
