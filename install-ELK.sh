@@ -4,6 +4,7 @@ curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearm
 echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] http://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 
 sudo apt update && sudo apt upgrade -y
+sudo apt install tree -y
 
 E=$(grep -c "generated password" ~/elastic.txt 2>/dev/null)
 if  [ $E -eq 0 ]
@@ -17,6 +18,14 @@ fi
 # /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
+
+# elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca -s --out elastic-stack-ca.p12 --pass $P
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert -s --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass $P
+sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/certs/
+
+sudo sed -i 's/#cluster.name: my-application/cluster.name: kis-elk/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/#node.name:/node.name:/' /etc/elasticsearch/elasticsearch.yml
 
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch
