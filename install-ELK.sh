@@ -33,11 +33,11 @@ sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticse
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
 
 # elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out elastic-stack-ca.p12 --pass $P
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out elastic-stack-ca.p12 --pass password
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass "" --out elastic-certificates.p12
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass password --name elastic-certificates --pass "" --out elastic-certificates.p12
 echo "Press any key to continue..."
 read -s -n 1
 
