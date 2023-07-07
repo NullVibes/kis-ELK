@@ -15,12 +15,12 @@ sudo sed -i 's/#elasticsearch.hosts: ["http://localhost:9200"]/elasticsearch.hos
 
 #*** Install Elasticsearch ***
 E=$(grep -c "generated password" ~/elastic.txt 2>/dev/null)
-if  [ $E -eq 0 ] || [ $E == "" ]
+if  [[ $E -eq 0 || $E == "" ]]
 then
   sudo apt install elasticsearch -y | tee ~/elastic.txt
-  P=$(grep "generated password" ~/elastic.txt 2>/devnull | awk '{ print $11 }')
+  P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 else
-  P=$(grep "generated password" ~/elastic.txt 2>/devnull | awk '{ print $11 }')
+  P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 fi
 
 echo "Elasticsearch installation complete."
