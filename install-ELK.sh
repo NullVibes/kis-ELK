@@ -41,7 +41,7 @@ sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/certs/
+sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/
 
 sudo sed -i 's/#cluster.name: my-application/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#node.name:/node.name:/' /etc/elasticsearch/elasticsearch.yml
