@@ -34,7 +34,7 @@ sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsear
 
 # elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
 sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out elastic-stack-ca.p12 --pass $P
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass ""
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass "" --out elastic-certificates.p12
 sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/certs/
 
 sudo sed -i 's/#cluster.name: my-application/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
