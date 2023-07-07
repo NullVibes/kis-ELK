@@ -1,13 +1,21 @@
 #!/bin/bash
 
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
-echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] http://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 
 sudo apt update && sudo apt upgrade -y
-sudo apt install tree -y
+sudo apt install tree apt-transport-https -y
 
+#*** Install Kibana ***
+sudo apt install kibana -y
+# /etc/kibana/kibana.yml
+sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
+sudo sed -i 's/#server.host: 192.168.0.1/server.host: 0.0.0.0/' /etc/kibana/kibana.yml
+sudo sed -i 's/#elasticsearch.hosts: ["http://localhost:9200"]/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml &>/dev/null
+
+#*** Install Elasticsearch ***
 E=$(grep -c "generated password" ~/elastic.txt 2>/dev/null)
-if  [ $E -eq 0 ]
+if  [ $E -eq 0 ] || [ $E == "" ]
 then
   sudo apt install elasticsearch -y | tee ~/elastic.txt
   P=$(grep "generated password" ~/elastic.txt 2>/devnull | awk '{ print $11 }')
@@ -15,17 +23,24 @@ else
   P=$(grep "generated password" ~/elastic.txt 2>/devnull | awk '{ print $11 }')
 fi
 
+echo "Elasticsearch installation complete."
+echo "Press any key to continue..."
+read -s -n 1
+
+
 # /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
 
 # elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca -s --out elastic-stack-ca.p12 --pass $P
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert -s --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass $P
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out elastic-stack-ca.p12 --pass $P
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass $P --name elastic-certificates --pass ""
 sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/certs/
 
-sudo sed -i 's/#cluster.name: my-application/cluster.name: kis-elk/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/#cluster.name: my-application/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#node.name:/node.name:/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/keystore.path: certs\/transport.p12/keystore.path: elastic-certificates.p12/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/truststore.path: certs\/transport.p12/truststore.path: elastic-certificates.p12/' /etc/elasticsearch/elasticsearch.yml
 
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch
@@ -33,17 +48,6 @@ sudo systemctl start elasticsearch
 
 # Elasticsearch Install Test
 curl -v -u elastic:$P -X GET "https://localhost:9200"
-echo ""
-echo "Press any key to continue..."
-read -s -n 1
-
-
-sudo apt install kibana -y
-# /etc/kibana/kibana.yml
-sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
-sudo sed -i 's/#server.host: 192.168.0.1/server.host: 0.0.0.0/' /etc/kibana/kibana.yml
-sudo sed -i 's/#elasticsearch.hosts: ["http://localhost:9200"]/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml &>/dev/null
-
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
@@ -76,17 +80,13 @@ echo 'output {
 sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstash -t
 sudo systemctl enable logstash
 sudo systemctl start logstash
+
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
 sudo apt install filebeat -y
-# SED/AWK
 # /etc/filebeat/filebeat.yml
-# hosts: ["localhost:5044"]
-# #output.elasticsearch:
-# output.logstash:
-# #hosts: ["localhost:9200"]
 sudo sed -i 's/#output.logstash:/output.logstash:/' /etc/filebeat/filebeat.yml
 sudo sed -i 's/#hosts: \["localhost:5044"\]/hosts: \["localhost:5044"\]/' /etc/filebeat/filebeat.yml
 sudo sed -i 's/output.elasticsearch:/#output.elasticsearch:/' /etc/filebeat/filebeat.yml
