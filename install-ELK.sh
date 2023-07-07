@@ -42,6 +42,10 @@ sudo sed -i 's/#node.name:/node.name:/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/keystore.path: certs\/transport.p12/keystore.path: elastic-certificates.p12/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/truststore.path: certs\/transport.p12/truststore.path: elastic-certificates.p12/' /etc/elasticsearch/elasticsearch.yml
 
+
+echo "Elasticsearch CONFIG complete."
+echo "Press any key to continue..."
+read -s -n 1
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch
 sudo systemctl start elasticsearch
