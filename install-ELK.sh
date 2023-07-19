@@ -1,42 +1,44 @@
 #!/bin/bash
 
+ES_HOME=/usr/share/elasticsearch
+ES_PATH_CONF=/etc/elasticsearch
+
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
 echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 
 sudo apt update && sudo apt upgrade -y
-sudo apt install tree apt-transport-https -y
+sudo apt install tree unzip -y
 
 #*** Install Kibana ***
 sudo apt install kibana -y
+
+A=$(grep -c "127.0.0.1 node1.local kibana.local logstash.local" /etc/hosts 2>/dev/null)
+if  [[ $A -eq 0 || $A == "" ]]
+then
+  echo '127.0.0.1 node1.local kibana.local logstash.local' | sudo tee -a /etc/hosts
+fi
+
 # /etc/kibana/kibana.yml
 sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
 sudo sed -i 's/#server.host: 192.168.0.1/server.host: 0.0.0.0/' /etc/kibana/kibana.yml
 sudo sed -i 's/#elasticsearch.hosts: ["http://localhost:9200"]/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml &>/dev/null
 
 #*** Install Elasticsearch ***
-E=$(grep -c "generated password" ~/elastic.txt 2>/dev/null)
-if  [[ $E -eq 0 || $E == "" ]]
-then
-  sudo apt install elasticsearch -y | tee ~/elastic.txt
-  P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
-else
-  P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
-fi
+sudo apt install elasticsearch -y | tee ~/elastic.txt
+P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 
 # /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
 
-# elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --out elastic-stack-ca.p12 --pass ""
+# Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --pem --out /etc/elasticsearch/certs/ca.zip --pass password
+
+sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --pem --in ~/instance.yml --out ~/certs.zip
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12 --ca-pass "" --name elastic-certificates --pass "" --out elastic-certificates.p12
-echo "Press any key to continue..."
-read -s -n 1
-
-sudo cp /usr/share/elasticsearch/elastic-certificates.p12 /etc/elasticsearch/
+sudo cp ~/certs.zip /etc/elasticsearch/
 
 sudo sed -i 's/#cluster.name: my-application/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#node.name:/node.name:/' /etc/elasticsearch/elasticsearch.yml
