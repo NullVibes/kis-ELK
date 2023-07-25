@@ -1,9 +1,9 @@
 #!/bin/bash
 
-ES_HOME=/usr/share/elasticsearch
-ES_PATH_CONF=/etc/elasticsearch
-KIBANA_HOME=/usr/share/kibana
-KIBANA_PATH_CONFIG=/etc/kibana
+declare -x ES_HOME="/usr/share/elasticsearch"
+declare -x ES_PATH_CONF="/etc/elasticsearch"
+declare -x KIBANA_HOME="/usr/share/kibana"
+declare -x KIBANA_PATH_CONFIG="/etc/kibana"
 
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
 echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
