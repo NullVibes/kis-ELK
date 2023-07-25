@@ -35,8 +35,6 @@ sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsear
 sudo /usr/share/elasticsearch/bin/elasticsearch-certutil ca --pem --out /etc/elasticsearch/certs/ca.zip --pass password
 
 sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert --pem --in ~/instance.yml --out ~/certs.zip
-echo "Press any key to continue..."
-read -s -n 1
 
 sudo cp ~/certs.zip /etc/elasticsearch/
 
