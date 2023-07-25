@@ -54,10 +54,24 @@ sudo sed -i 's/.http.port:/http.port: 9200/' /etc/elasticsearch/elasticsearch.ym
 sudo sed -i 's/.xpack.security.enabled:.*/xpack.security.enabled: true' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
+#xpack.security.http.ssl:
+#  enabled: true
+#  key: certs/node1/node1.key
+#  certificate: certs/node1/node1.crt
+#  certificate_authorities: certs/ca/ca.crt
+#  #keystore.path: certs/http.p12 (comment-out)
 
-sudo sed -i 's/.http.host:/http.host:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/^keystore.path: certs\/http.p12/#keystore.path:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.truststore.path:.*/#truststore.path:/' /etc/elasticsearch/elasticsearch.yml
+#xpack.security.transport.ssl:
+#  enabled: true
+#  verification_mode: certificate
+#  key: certs/node1/node1.key
+#  certificate: certs/node1/node1.crt
+#  certificate_authorities: certs/ca/ca.crt
+#  #keystore.path: certs/transport.p12 (comment-out)
+#  #truststore.path: certs/transport.p12 (comment-out)
+sudo sed -i 's/.http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
+#sudo sed -i 's/  keystore.path: certs\/http.p12/#  keystore.path:/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/  truststore.path:.*/#  truststore.path:/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.cluster.initial_master_nodes:/cluster.initial_master_nodes: ["node1"]/' /etc/elasticsearch/elasticsearch.yml
 
 # Create ES Certificate Authority & Certs for TLS
