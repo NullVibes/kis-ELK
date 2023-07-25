@@ -1,9 +1,9 @@
 #!/bin/bash
 
-declare -x ES_HOME=/usr/share/elasticsearch
-declare -x ES_PATH_CONF=/etc/elasticsearch
-declare -x KIBANA_HOME=/usr/share/kibana
-declare -x KIBANA_PATH_CONFIG=/etc/kibana
+export ES_HOME=/usr/share/elasticsearch
+export ES_PATH_CONF=/etc/elasticsearch
+export KIBANA_HOME=/usr/share/kibana
+export KIBANA_PATH_CONFIG=/etc/kibana
 
 EGPG=/usr/share/keyrings/elastic.gpg
 if [[ ! -f "$EGPG" ]]; then
