@@ -5,8 +5,15 @@ declare -x ES_PATH_CONF=/etc/elasticsearch
 declare -x KIBANA_HOME=/usr/share/kibana
 declare -x KIBANA_PATH_CONFIG=/etc/kibana
 
-curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
-echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+EGPG=/usr/share/keyrings/elastic.gpg
+if [[ ! -f "$EGPG" ]]; then
+  curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+fi
+
+EDEB=/etc/apt/sources.list.d/elastic-8.x.list
+if [[ ! -f "EDEB" ]]; then
+  echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+fi
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install vim curl git tree unzip -y
@@ -20,7 +27,9 @@ then
   echo '127.0.0.1 node1.local kibana.local logstash.local' | sudo tee -a /etc/hosts
 fi
 
-echo "instances:
+TMPINST=/tmp/instance.yml
+if [[ ! -f "$TMPINST" ]]; then
+  echo "instances:
   - name: 'node1'
     dns: [ 'node1.local' ]
   - name: 'kibana'
@@ -28,6 +37,7 @@ echo "instances:
   - name: 'logstash'
     dns: [ 'logstash.local' ]
 " | tee /tmp/instance.yml
+fi
 
 KBAK=/etc/kibana/kibana.yml.bak
 if [[ ! -f "$KBAK" ]]; then
