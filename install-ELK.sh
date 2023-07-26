@@ -8,6 +8,11 @@ export KIBANA_PATH_CONFIG=/etc/kibana" | tee /tmp/exports.sh
 chmod +x /tmp/exports.sh
 source /tmp/./exports.sh
 
+ES_HOME=/usr/share/elasticsearch
+ES_PATH=/etc/elasticsearch
+KIBANA_HOME=/usr/share/kibana
+KIBANA_PATH_CONFIG=/etc/kibana
+
 EGPG=/usr/share/keyrings/elastic.gpg
 if [[ ! -f "$EGPG" ]]; then
   curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
