@@ -29,7 +29,7 @@ sudo apt install tree unzip -y
 #*** Install Kibana ***
 sudo apt install kibana -y
 
-A=$(grep -c "127.0.0.1 node1.local kibana.local logstash.local" /etc/hosts)
+A=$(sudo grep -c "127.0.0.1 node1.local kibana.local logstash.local" /etc/hosts)
 if  [[ $A -eq 0 || $A == "" ]]
 then
   echo '127.0.0.1 node1.local kibana.local logstash.local' | sudo tee -a /etc/hosts
@@ -86,7 +86,7 @@ sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.
 #  certificate_authorities: certs/ca/ca.crt
 #  #keystore.path: certs/http.p12 (comment-out)
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-B=$(grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+B=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
 if [[ $B -eq 0 ]]; then
   sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
 fi
@@ -101,7 +101,7 @@ sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elastics
 #  #keystore.path: certs/transport.p12 (comment-out)
 #  #truststore.path: certs/transport.p12 (comment-out)
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
-C=$(grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+C=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
 if [[ $C -eq 1 ]]; then
   sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
 fi
