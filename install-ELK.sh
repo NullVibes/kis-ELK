@@ -51,9 +51,9 @@ sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' /etc/kibana/ki
 sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml &>/dev/null
-sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml &>/dev/null
-sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml &>/dev/null
+sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
 #*** Install Elasticsearch ***
 sudo apt install elasticsearch -y | tee ~/elastic.txt
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
@@ -79,7 +79,7 @@ sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.
 #  #keystore.path: certs/http.p12 (comment-out)
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/'
+sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
 
 #xpack.security.transport.ssl:
 #  enabled: true
@@ -91,8 +91,8 @@ sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/'
 #  #truststore.path: certs/transport.p12 (comment-out)
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i '/.keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/'
-sudo sed -i 's/.truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/'
+sudo sed -i 's/.keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 #
 sudo sed -i 's/.http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
