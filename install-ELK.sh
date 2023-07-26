@@ -108,15 +108,13 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 # Create ES Certificate Authority & Certs for TLS
 # Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
 sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password
-sudo unzip $ES_PATH_CONFIG/certs/ca.zip
-echo ""
-echo "*** STOP HERE ***"
+sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
 sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_HOME/ca/ca.crt --ca-key $ES_HOME/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs.zip
-sudo unzip $ES_PATH_CONFIG/certs/certs.zip
+sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
 echo "Press any key to continue..."
 read -s -n 1
 
