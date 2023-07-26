@@ -128,8 +128,8 @@ echo "Elasticsearch CONFIG complete."
 echo "Press any key to continue..."
 read -s -n 1
 sudo systemctl daemon-reload
-#sudo systemctl enable elasticsearch
-#sudo systemctl start elasticsearch
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
 echo "Press any key to continue..."
 read -s -n 1
 
@@ -166,8 +166,7 @@ echo 'output {
 
 sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstash -t
 sudo systemctl enable logstash
-#sudo systemctl start logstash
-
+sudo systemctl start logstash
 
 sudo apt install filebeat -y
 sudo cp /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.bak
@@ -182,3 +181,6 @@ sudo filebeat setup --index-management -E output.logstash.enabled=false -E 'outp
 sudo filebeat setup -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]' -E setup.kibana.host=localhost:5601
 sudo filebeat modules enable system
 sudo systemctl enable filebeat
+
+sudo systemctl enable kibana
+sudo systemctl start kibana
