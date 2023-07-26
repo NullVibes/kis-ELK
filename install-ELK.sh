@@ -24,7 +24,7 @@ if [[ ! -f "EDEB" ]]; then
 fi
 
 sudo apt update && sudo apt upgrade -y
-sudo apt install vim curl git tree unzip -y
+sudo apt install tree unzip -y
 
 #*** Install Kibana ***
 sudo apt install kibana -y
