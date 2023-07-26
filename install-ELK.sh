@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo "export -r ES_HOME=/usr/share/elasticsearch
-export -r ES_PATH_CONF=/etc/elasticsearch
-export -r KIBANA_HOME=/usr/share/kibana
-export -r KIBANA_PATH_CONFIG=/etc/kibana" | tee /tmp/exports.sh
+echo "export ES_HOME=/usr/share/elasticsearch
+export ES_PATH_CONF=/etc/elasticsearch
+export KIBANA_HOME=/usr/share/kibana
+export KIBANA_PATH_CONFIG=/etc/kibana" | tee /tmp/exports.sh
 
 chmod +x /tmp/exports.sh
-source /tmp/exports.sh
+source ./tmp/exports.sh
 
 EGPG=/usr/share/keyrings/elastic.gpg
 if [[ ! -f "$EGPG" ]]; then
