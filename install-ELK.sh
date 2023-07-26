@@ -119,7 +119,7 @@ echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_PATH_CONFIG/ca/ca.crt --ca-key $ES_PATHCONFIG/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs.zip
+sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_PATH_CONFIG/certs/ca/ca.crt --ca-key $ES_PATHCONFIG/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs/certs.zip
 sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
 echo "Press any key to continue..."
 read -s -n 1
