@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "export ES_HOME=/usr/share/elasticsearch
-export ES_PATH_CONF=/etc/elasticsearch
+export ES_PATH_CONFIG=/etc/elasticsearch
 export KIBANA_HOME=/usr/share/kibana
 export KIBANA_PATH_CONFIG=/etc/kibana" | tee /tmp/exports.sh
 
@@ -9,7 +9,7 @@ chmod +x /tmp/exports.sh
 source /tmp/./exports.sh
 
 ES_HOME=/usr/share/elasticsearch
-ES_PATH=/etc/elasticsearch
+ES_PATH_CONFIG=/etc/elasticsearch
 KIBANA_HOME=/usr/share/kibana
 KIBANA_PATH_CONFIG=/etc/kibana
 
