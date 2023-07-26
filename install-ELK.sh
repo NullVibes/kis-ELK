@@ -59,7 +59,7 @@ sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' /etc/kibana/ki
 sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http://localhost:9200"\]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
 #*** Install Elasticsearch ***
@@ -86,7 +86,7 @@ sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.
 #  certificate_authorities: certs/ca/ca.crt
 #  #keystore.path: certs/http.p12 (comment-out)
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
 
 #xpack.security.transport.ssl:
@@ -98,25 +98,25 @@ sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elastics
 #  #keystore.path: certs/transport.p12 (comment-out)
 #  #truststore.path: certs/transport.p12 (comment-out)
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i '/.keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 #
-sudo sed -i 's/.http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
 
 # Create ES Certificate Authority & Certs for TLS
 # Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONF/certs/ca.zip --pass password
-sudo unzip $ES_PATH_CONF/certs/ca.zip
+sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password
+sudo unzip $ES_PATH_CONFIG/certs/ca.zip
 echo ""
 echo "*** STOP HERE ***"
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_HOME/ca/ca.crt --ca-key $ES_HOME/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out $ES_PATH_CONF/certs.zip
-sudo unzip $ES_PATH_CONF/certs/certs.zip
+sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_HOME/ca/ca.crt --ca-key $ES_HOME/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs.zip
+sudo unzip $ES_PATH_CONFIG/certs/certs.zip
 echo "Press any key to continue..."
 read -s -n 1
 
