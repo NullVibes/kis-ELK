@@ -54,7 +54,7 @@ sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' /etc/kibana/ki
 sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http://localhost:9200"\]/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
 #*** Install Elasticsearch ***
