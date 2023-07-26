@@ -86,7 +86,10 @@ sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.
 #  certificate_authorities: certs/ca/ca.crt
 #  #keystore.path: certs/http.p12 (comment-out)
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+B=$(grep -c "certificate: certs/node1/node.crt" /etc/elasticsearch/elasticsearch.yml
+if [[ B -eq 0 ]]; then
+  sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+fi
 sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
 
 #xpack.security.transport.ssl:
@@ -98,7 +101,10 @@ sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elastics
 #  #keystore.path: certs/transport.p12 (comment-out)
 #  #truststore.path: certs/transport.p12 (comment-out)
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+C=$(grep -c "certificate: certs/node1/node.crt" /etc/elasticsearch/elasticsearch.yml
+if [[ C -eq 1 ]]; then
+  sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+fi
 sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 #
