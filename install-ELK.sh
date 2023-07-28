@@ -62,9 +62,9 @@ sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana
 sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate: /etc/elasticsearch/certs/kibana/kibana.crt/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: /etc/elasticsearch/certs/kibana/kibana.key/' /etc/kibana/kibana.yml
-sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \[ "/etc/elasticsearch/certs/ca/ca.crt" \]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate: /etc/kibana/certs/kibana.crt/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: /etc/kibana/certs/kibana.key/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \[ "/etc/kibana/certs/ca.crt" \]/' /etc/kibana/kibana.yml
 
 if [[ ! -d "/usr/share/kibana/config" ]]; then
   # Is this hard-coded?
@@ -143,6 +143,7 @@ echo "Press any key to continue..."
 read -s -n 1
 
 sudo cp /$ES_PATH_CONFIG/certs/kibana/* /etc/kibana/certs/
+sudo cp /$ES_PATH_CONFIG/certs/ca/ca.crt /etc/kibana/certs/
 
 echo "Elasticsearch CONFIG complete."
 echo "Press any key to continue..."
