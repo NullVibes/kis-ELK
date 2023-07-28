@@ -71,6 +71,11 @@ if [[ ! -d "/usr/share/kibana/config" ]]; then
   sudo mkdir /usr/share/kibana/config
 fi
 
+if [[ ! -d "/etc/kibana/certs" ]]; then
+  # Is this hard-coded?
+  sudo mkdir /etc/kibana/certs
+fi
+
 if [[ ! -f "/usr/share/kibana/config/kibana.yml" ]]; then
   sudo ln -s /etc/kibana/kibana.yml /usr/share/kibana/config/kibana.yml
 fi
@@ -136,6 +141,8 @@ sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs
 sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
 echo "Press any key to continue..."
 read -s -n 1
+
+sudo cp /$ES_PATH_CONFIG/certs/kibana/* /etc/kibana/certs/
 
 echo "Elasticsearch CONFIG complete."
 echo "Press any key to continue..."
