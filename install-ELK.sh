@@ -66,6 +66,15 @@ sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate:
 sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: /etc/elasticsearch/certs/kibana/kibana.key/' /etc/kibana/kibana.yml
 sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \[ "/etc/elasticsearch/certs/ca/ca.crt" \]/' /etc/kibana/kibana.yml
 
+if [[ ! -d "/usr/share/kibana/config" ]]; then
+  # Is this hard-coded?
+  sudo mkdir /usr/share/kibana/config
+fi
+
+if [[ ! -f "/usr/share/kibana/config/kibana.yml" ]]; then
+  sudo ln -s /etc/kibana/kibana.yml /usr/share/kibana/config/kibana.yml
+fi
+
 #*** Install Elasticsearch ***
 sudo apt install elasticsearch -y | tee ~/elastic.txt
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
