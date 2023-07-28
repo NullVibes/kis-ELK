@@ -80,6 +80,9 @@ if [[ ! -f "/usr/share/kibana/config/kibana.yml" ]]; then
   sudo ln -s /etc/kibana/kibana.yml /usr/share/kibana/config/kibana.yml
 fi
 
+# Create enrollment token for Kibana _AFTER_ Elasticsearch is installed/configured
+# /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+
 #*** Install Elasticsearch ***
 sudo apt install elasticsearch -y | tee ~/elastic.txt
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
