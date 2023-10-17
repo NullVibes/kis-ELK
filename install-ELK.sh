@@ -72,11 +72,11 @@ sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /e
 echo "sed #9"
 sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
 echo "sed #10"
-sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate: /etc/kibana/certs/kibana.crt/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate: "/etc/kibana/certs/kibana.crt"/' /etc/kibana/kibana.yml
 echo "sed #11"
-sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: /etc/kibana/certs/kibana.key/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: "/etc/kibana/certs/kibana.key"/' /etc/kibana/kibana.yml
 echo "sed #12"
-sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \[ "/etc/kibana/certs/ca.crt" \]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \["/etc/kibana/certs/ca.crt"\]/' /etc/kibana/kibana.yml
 
 if [[ ! -d "/usr/share/kibana/config" ]]; then
   # Is this hard-coded?
