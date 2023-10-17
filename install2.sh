@@ -82,8 +82,6 @@ sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs
 sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
 
 #sudo systemctl enable elasticsearch
-sudo systemctl restart elasticsearch
-
 sudo systemctl start elasticsearch
 
 # Elasticsearch Install Test
