@@ -53,17 +53,29 @@ if [[ ! -f "$KBAK" ]]; then
 fi
 
 # /etc/kibana/kibana.yml
+echo "sed #1"
 sudo sed -i 's/.*server.port:.*/server.port: 5601/' /etc/kibana/kibana.yml
+echo "sed #2"
 sudo sed -i 's/.*server.name:.*/server.name: "Kis-ELK"/' /etc/kibana/kibana.yml
+echo "sed #3"
 sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' /etc/kibana/kibana.yml
+echo "sed #4"
 sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' /etc/kibana/kibana.yml
+echo "sed #5"
 sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /etc/kibana/kibana.yml
+echo "sed #6"
 sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana.yml
+echo "sed #7"
 sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
+echo "sed #8"
 sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
+echo "sed #9"
 sudo sed -i 's/.*elasticsearch.password:.*/elasticsearch.password: "pass"/' /etc/kibana/kibana.yml
+echo "sed #10"
 sudo sed -i 's/.*elasticsearch.ssl.certificate:.*/elasticsearch.ssl.certificate: /etc/kibana/certs/kibana.crt/' /etc/kibana/kibana.yml
+echo "sed #11"
 sudo sed -i 's/.*elasticsearch.ssl.key:.*/elasticsearch.ssl.key: /etc/kibana/certs/kibana.key/' /etc/kibana/kibana.yml
+echo "sed #12"
 sudo sed -i 's/.*elasticsearch.ssl.certificateAuthorities:.*/elasticsearch.ssl.certificateAuthorities: \[ "/etc/kibana/certs/ca.crt" \]/' /etc/kibana/kibana.yml
 
 if [[ ! -d "/usr/share/kibana/config" ]]; then
