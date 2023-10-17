@@ -21,79 +21,6 @@ fi
 sudo apt update && sudo apt upgrade -y
 sudo apt install unzip -y
 
-#*** Install Elasticsearch ***
-sudo apt install elasticsearch -y | tee ~/elastic.txt
-P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
-
-EBAK=/etc/elasticsearch/elasticsearch.yml.bak
-if [[ ! -f "$EBAK" ]]; then
- sudo cp /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml.bak
-fi
-
-# /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*node.name:.*/node.name: node1/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*http.port:.*/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' /etc/elasticsearch/elasticsearch.yml
-
-#xpack.security.http.ssl:
-#  enabled: true
-#  key: certs/node1/node1.key
-#  certificate: certs/node1/node1.crt
-#  certificate_authorities: certs/ca/ca.crt
-#  #keystore.path: certs/http.p12 (comment-out)
-sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-B=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
-if [[ $B -eq 0 ]]; then
-  sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
-fi
-sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
-
-#xpack.security.transport.ssl:
-#  enabled: true
-#  verification_mode: certificate
-#  key: certs/node1/node1.key
-#  certificate: certs/node1/node1.crt
-#  certificate_authorities: certs/ca/ca.crt
-#  #keystore.path: certs/transport.p12 (comment-out)
-#  #truststore.path: certs/transport.p12 (comment-out)
-sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
-C=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
-if [[ $C -eq 1 ]]; then
-  sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
-fi
-sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
-#
-sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
-
-# Create ES Certificate Authority & Certs for TLS
-# Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password
-sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
-echo ""
-echo "Press any key to continue..."
-read -s -n 1
-
-sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip
-sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
-
-#sudo systemctl enable elasticsearch
-sudo systemctl start elasticsearch
-
-# Elasticsearch Install Test
-curl -k -v -u elastic:$P "https://localhost:9200"
-
-echo "Elasticsearch CONFIG complete."
-echo "Press any key to continue..."
-read -s -n 1
-
-# EXIT
-exit
-
 #*** Install Kibana ***
 sudo apt install kibana -y
 
@@ -166,7 +93,77 @@ fi
 # Create enrollment token for Kibana _AFTER_ Elasticsearch is installed/configured
 # /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
 
+#*** Install Elasticsearch ***
+sudo apt install elasticsearch -y | tee ~/elastic.txt
+P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 
+EBAK=/etc/elasticsearch/elasticsearch.yml.bak
+if [[ ! -f "$EBAK" ]]; then
+ sudo cp /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml.bak
+fi
+
+# /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*node.name:.*/node.name: node1/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*http.port:.*/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' /etc/elasticsearch/elasticsearch.yml
+
+#xpack.security.http.ssl:
+#  enabled: true
+#  key: certs/node1/node1.key
+#  certificate: certs/node1/node1.crt
+#  certificate_authorities: certs/ca/ca.crt
+#  #keystore.path: certs/http.p12 (comment-out)
+sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
+B=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+if [[ $B -eq 0 ]]; then
+  sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+fi
+sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
+
+#xpack.security.transport.ssl:
+#  enabled: true
+#  verification_mode: certificate
+#  key: certs/node1/node1.key
+#  certificate: certs/node1/node1.crt
+#  certificate_authorities: certs/ca/ca.crt
+#  #keystore.path: certs/transport.p12 (comment-out)
+#  #truststore.path: certs/transport.p12 (comment-out)
+sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
+C=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+if [[ $C -eq 1 ]]; then
+  sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+fi
+sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
+#
+sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
+
+# Create ES Certificate Authority & Certs for TLS
+# Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
+sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password
+sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
+echo ""
+echo "Press any key to continue..."
+read -s -n 1
+
+sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip
+sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
+
+#sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
+
+# Elasticsearch Install Test
+curl -k -v -u elastic:$P "https://localhost:9200"
+
+echo "Elasticsearch CONFIG complete."
+echo "Press any key to continue..."
+read -s -n 1
+
+#*** Install Logstash ***
 sudo apt install logstash -y
 # /etc/logstash/conf.d/30-elasticsearch-output.conf
 echo 'input {
@@ -196,6 +193,7 @@ sudo -u logstash /usr/share/logstash/bin/./logstash --path.settings /etc/logstas
 sudo systemctl enable logstash
 sudo systemctl start logstash
 
+#*** Install Filebeat ***
 sudo apt install filebeat -y
 sudo cp /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.bak
 # /etc/filebeat/filebeat.yml
