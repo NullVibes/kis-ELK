@@ -35,17 +35,6 @@ sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' /etc/elasticsearch/elast
 sudo sed -i 's/.*node.name:.*/node.name: node1/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*http.port:.*/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
-
-sudo systemctl start elasticsearch
-
-# Elasticsearch Install Test
-curl -v -u elastic:$P -X GET "https://localhost:9200"
-echo ""
-echo "Press any key to continue..."
-read -s -n 1
-
-exit
-
 sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' /etc/elasticsearch/elasticsearch.yml
 
@@ -92,9 +81,14 @@ read -s -n 1
 sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip
 sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
 
-sudo systemctl daemon-reload
 #sudo systemctl enable elasticsearch
+sudo systemctl restart elasticsearch
+
 sudo systemctl start elasticsearch
+
+# Elasticsearch Install Test
+curl -k -v -u elastic:$P "https://localhost:9200"
+
 echo "Elasticsearch CONFIG complete."
 echo "Press any key to continue..."
 read -s -n 1
