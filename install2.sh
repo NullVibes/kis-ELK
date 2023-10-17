@@ -35,6 +35,9 @@ fi
 
 #Install OpenJDK
 sudo apt install openjdk-11-jdk -y
+java --version
+echo "Press any key to continue..."
+read -s -n 1
 
 #*** Install Elasticsearch ***
 sudo apt install elasticsearch -y | tee ~/elastic.txt
