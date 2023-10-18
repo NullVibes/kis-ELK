@@ -83,7 +83,7 @@ if [[ $C -eq 1 ]]; then
 fi
 
 echo "Elasticsearch sed #11"
-sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12' /etc/elasticsearch/elasticsearch.yml
+sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12/' /etc/elasticsearch/elasticsearch.yml
 echo "Elasticsearch sed #12"
 sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 echo "Elasticsearch sed #13"
