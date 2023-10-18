@@ -97,8 +97,8 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 # Notes:
 #        - By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
 #        - Test for previous certificates first
-CERTTEST=$ES_PATH_CONFIG/certs/ca.zip
-if [[ ! -f "$CERTTEST" ]]; then
+CERTTEST=$ES_PATH_CONFIG/certs/node1
+if [[ ! -d "$CERTTEST" ]]; then
   sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password &> /tmp/certutil.txt
   sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
   sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip &> /tmp/certutil.txt
