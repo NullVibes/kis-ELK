@@ -19,8 +19,8 @@ if [[ ! -f "EDEB" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 fi
 
-sudo apt update && sudo apt upgrade -y &1
-sudo apt install apt-transport-https unzip -y
+sudo apt update && sudo apt upgrade -y 1>/dev/null
+sudo apt install apt-transport-https unzip -y 1>/dev/null
 TMPIP=$(ip a | grep 172 | awk '{print $2}' | cut -d '/' -f1)
 TMPINST=/tmp/instance.yml
 if [[ ! -f "$TMPINST" ]]; then
