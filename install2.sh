@@ -19,7 +19,7 @@ if [[ ! -f "EDEB" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 fi
 
-sudo apt update && sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y &1
 sudo apt install apt-transport-https unzip -y
 TMPIP=$(ip a | grep 172 | awk '{print $2}' | cut -d '/' -f1)
 TMPINST=/tmp/instance.yml
@@ -37,14 +37,16 @@ if [[ ! -f "$TMPINST" ]]; then
 fi
 
 #Install OpenJDK
-sudo apt install openjdk-11-jdk -y &> /tmp/openjdk.txt
+echo "Installing OpenJDK"
+sudo apt install openjdk-11-jdk -y 1>/tmp/openjdk.txt && echo "Done."
 java --version
+echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
 #*** Install Elasticsearch ***
 echo "Installing Elasticsearch"
-sudo apt install elasticsearch -y &> ~/elastic.txt
+sudo apt install elasticsearch -y &> ~/elastic.txt && echo "Done."
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 
 EBAK=/etc/elasticsearch/elasticsearch.yml.bak
@@ -108,11 +110,16 @@ if [[ ! -d "$CERTTEST" ]]; then
 fi
 
 sudo systemctl daemon-reload
-sudo systemctl enable elasticsearch
-sudo systemctl start elasticsearch
+ESSTATUS=$(systemctl status elasticsearch | grep -c "Active")
+if [[ $ESSTATUS -eq 0 ]]; then
+  sudo systemctl enable elasticsearch
+  sudo systemctl start elasticsearch
+else
+  sudo systemctl restart elasticsearch
+fi
 
-ESSTAUS=$(systemctl status elasticsearch | grep Active | awk '{print $2}')
-if [[ $ESSTATUS -eq "failed" ]]; then
+ESSTATUS=$(systemctl status elasticsearch | grep Active | awk '{print $2}')
+if [[ $ESSTATUS == "failed" ]]; then
   echo "Elasticsearch config failed!"
   exit
 fi
