@@ -3,7 +3,8 @@
 echo "export ES_HOME=/usr/share/elasticsearch
 export ES_PATH_CONFIG=/etc/elasticsearch
 export KIBANA_HOME=/usr/share/kibana
-export KIBANA_PATH_CONFIG=/etc/kibana" | tee /tmp/exports.sh
+export KIBANA_PATH_CONFIG=/etc/kibana
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" | tee /tmp/exports.sh
 
 chmod +x /tmp/exports.sh
 source /tmp/./exports.sh
@@ -20,7 +21,7 @@ fi
 
 sudo apt update && sudo apt upgrade -y
 sudo apt install apt-transport-https unzip -y
-
+TMPIP=$(ip a | grep 172 | awk '{print $2}' | cut -d '/' -f1)
 TMPINST=/tmp/instance.yml
 if [[ ! -f "$TMPINST" ]]; then
   echo "instances:
@@ -30,17 +31,19 @@ if [[ ! -f "$TMPINST" ]]; then
     dns: [ 'kibana.local' ]
   - name: 'logstash'
     dns: [ 'logstash.local' ]
+  - name: '$TMPIP'
+    dns: [ 'node1.local' ]
 " | tee /tmp/instance.yml
 fi
 
 #Install OpenJDK
-sudo apt install openjdk-11-jdk -y
+sudo apt install openjdk-11-jdk -y &> /tmp/openjdk.txt
 java --version
 echo "Press any key to continue..."
 read -s -n 1
 
 #*** Install Elasticsearch ***
-sudo apt install elasticsearch -y | tee ~/elastic.txt
+sudo apt install elasticsearch -y &> /tmp/elastic.txt
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 
 EBAK=/etc/elasticsearch/elasticsearch.yml.bak
@@ -56,7 +59,6 @@ sudo sed -i 's/.*http.port:.*/http.port: 9200/' /etc/elasticsearch/elasticsearch
 sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path:/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
 
 B=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
@@ -69,6 +71,7 @@ if [[ $C -eq 1 ]]; then
   sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
 fi
 
+sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
 #
@@ -77,14 +80,14 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 
 # Create ES Certificate Authority & Certs for TLS
 # Note: By default, elastic-stack-ca.p12 file is created in /usr/share/elasticsearch/
-sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password
+sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password &> /tmp/certutil.txt
 
 sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
-sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip
+sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip &> /tmp/certutil.txt
 echo "Press any key to continue..."
 read -s -n 1
 
@@ -103,7 +106,7 @@ echo "Press any key to continue..."
 read -s -n 1
 
 #*** Install Kibana ***
-sudo apt install kibana -y
+sudo apt install kibana -y &> /tmp/kibana.txt
 
 sudo cp /$ES_PATH_CONFIG/certs/kibana/* /etc/kibana/certs/
 sudo cp /$ES_PATH_CONFIG/certs/ca/ca.crt /etc/kibana/certs/
@@ -133,7 +136,7 @@ sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /
 echo "sed #6"
 sudo sed -i 's/.*server.host:.*/server.host: "kibana.local"/' /etc/kibana/kibana.yml
 echo "sed #7"
-sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["http:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*elasticsearch.hosts:.*/elasticsearch.hosts: \["https:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
 echo "sed #8"
 sudo sed -i 's/.*elasticsearch.username:.*/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 echo "sed #9"
@@ -161,8 +164,11 @@ fi
 # Create enrollment token for Kibana _AFTER_ Elasticsearch is installed/configured
 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
 
+echo "Press any key to continue..."
+read -s -n 1
+
 #*** Install Logstash ***
-sudo apt install logstash -y
+sudo apt install logstash -y &> /tmp/logstash.txt
 # /etc/logstash/conf.d/30-elasticsearch-output.conf
 echo 'input {
   beats {
