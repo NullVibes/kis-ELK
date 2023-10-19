@@ -60,53 +60,54 @@ read -s -n 1
 #*** Install Elasticsearch ***
 echo -n "Installing Elasticsearch"
 sudo apt install elasticsearch -y &> ~/elastic.txt && echo "Done."
-P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
-
-EBAK=/etc/elasticsearch/elasticsearch.yml.bak
+P=$(grep "generated password" /tmp/elastic.txt 2>/dev/null | awk '{ print $11 }')
+ES_PATH_CONFIG=/etc/elasticsearch
+ES_HOME=/usr/share/elasticsearch
+EBAK=$ES_PATH_CONFIG/elasticsearch.yml.bak
 if [[ ! -f "$EBAK" ]]; then
- sudo cp /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml.bak
+ sudo cp $ES_PATH_CONFIG/elasticsearch.yml $ES_PATH_CONFIG/elasticsearch.yml.bak
 fi
 
 # /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #1"
-sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #2"
-sudo sed -i 's/.*node.name:.*/node.name: node1/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #3"
-sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #4"
-sudo sed -i 's/.*http.port:.*/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #5"
-sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #6"
-sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #7"
-sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #8"
-sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' /etc/elasticsearch/elasticsearch.yml
+#echo "Elasticsearch sed #1"
+sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #2"
+sudo sed -i 's/.*node.name:.*/node.name: node1/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #3"
+sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #4"
+sudo sed -i 's/.*http.port:.*/http.port: 9200/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #5"
+sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #6"
+sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #7"
+sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #8"
+sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' $ES_PATH_CONFIG/elasticsearch.yml
 
-B=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+B=$(sudo grep -c "node1.crt" $ES_PATH_CONFIG/elasticsearch.yml)
 if [[ $B -eq 0 ]]; then
-  echo "Elasticsearch sed #9"
-  sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+  #echo "Elasticsearch sed #9"
+  sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' $ES_PATH_CONFIG/elasticsearch.yml
 fi
 
-C=$(sudo grep -c "node1.crt" /etc/elasticsearch/elasticsearch.yml)
+C=$(sudo grep -c "node1.crt" $ES_PATH_CONFIG/elasticsearch.yml)
 if [[ $C -eq 1 ]]; then
-  echo "Elasticsearch sed #10"
-  sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' /etc/elasticsearch/elasticsearch.yml
+  #echo "Elasticsearch sed #10"
+  sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' $ES_PATH_CONFIG/elasticsearch.yml
 fi
 
-echo "Elasticsearch sed #11"
-sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #12"
-sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #13"
-sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #14"
-sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
-echo "Elasticsearch sed #15"
-sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' /etc/elasticsearch/elasticsearch.yml
+#echo "Elasticsearch sed #11"
+sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #12"
+sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #13"
+sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #14"
+sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' $ES_PATH_CONFIG/elasticsearch.yml
+#echo "Elasticsearch sed #15"
+sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' $ES_PATH_CONFIG/elasticsearch.yml
 
 # Create ES Certificate Authority & Certs for TLS
 # Notes:
@@ -116,7 +117,7 @@ CERTTEST=$ES_PATH_CONFIG/certs/node1
 if [[ ! -d "$CERTTEST" ]]; then
   sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 &> /tmp/certutil.txt
   sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
-  sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass $TMPPWORD1 --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip &> /tmp/certutil.txt
+  sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_PATH_CONFIG/certs/ca/ca.crt --ca-key $ES_PATH_CONFIG/certs/ca/ca.key --pem --ca-pass $TMPPWORD1 --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs/certs.zip &> /tmp/certutil.txt
   sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
   echo "Press any key to continue..."
   read -s -n 1
@@ -139,17 +140,17 @@ if [[ $ESSTATUS == "failed" ]]; then
 fi
 
 # Elasticsearch Install Test
-curl -k -v -u elastic:$P "https://localhost:9200"
+curl -k -v "https://localhost:9200" -u elastic:$P
 echo ""
 echo "Elasticsearch install/config complete."
 echo "Press any key to continue..."
 read -s -n 1
 
 #*** Install Kibana ***
-sudo apt install kibana -y &> /tmp/kibana.txt
-
-sudo cp /$ES_PATH_CONFIG/certs/kibana/* /etc/kibana/certs/
-sudo cp /$ES_PATH_CONFIG/certs/ca/ca.crt /etc/kibana/certs/
+KB_PATH=/etc/kibana
+echo "" && echo -n "Installing Kibana..." && sudo apt install kibana -y &> /tmp/kibana.txt && echo "Done"
+sudo cp /$ES_PATH_CONFIG/certs/kibana/* $KB_PATH/certs/
+sudo cp /$ES_PATH_CONFIG/certs/ca/ca.crt $KB_PATH/certs/
 
 A=$(sudo grep -c "127.0.0.1 node1.local kibana.local logstash.local" /etc/hosts)
 if  [[ $A -eq 0 || $A == "" ]]
@@ -157,20 +158,20 @@ then
   echo '127.0.0.1 node1.local kibana.local logstash.local' | sudo tee -a /etc/hosts
 fi
 
-KBAK=/etc/kibana/kibana.yml.bak
+KBAK=$KB_PATH/kibana.yml.bak
 if [[ ! -f "$KBAK" ]]; then
-  sudo cp /etc/kibana/kibana.yml /etc/kibana/kibana.yml.bak
+  sudo cp $KB_PATH/kibana.yml $KB_PATH/kibana.yml.bak
 fi
 
 # /etc/kibana/kibana.yml
 echo "Kibana sed #1"
-sudo sed -i 's/.*server.port:.*/server.port: 5601/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*server.port:.*/server.port: 5601/' $KB_PATH/kibana.yml
 echo "Kibana sed #2"
-sudo sed -i 's/.*server.name:.*/server.name: "Kis-ELK"/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*server.name:.*/server.name: "Kis-ELK"/' $KB_PATH/kibana.yml
 echo "Kibana sed #3"
-sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*server.ssl.enabled:.*/server.ssl.enabled: true/' $KB_PATH/kibana.yml
 echo "Kibana sed #4"
-sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' /etc/kibana/kibana.yml
+sudo sed -i 's/.*server.ssl.certificate:.*/server.ssl.certificate: \/etc\/kibana\/kibana.crt/' $KB_PATH/kibana.yml
 echo "Kibana sed #5"
 sudo sed -i 's/.*server.ssl.key:.*/server.ssl.key: \/etc\/kibana\/kibana.key/' /etc/kibana/kibana.yml
 echo "Kibana sed #6"
