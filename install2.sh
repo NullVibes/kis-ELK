@@ -19,26 +19,38 @@ if [[ ! -f "EDEB" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 fi
 
-sudo apt update && sudo apt upgrade -y 1>/dev/null
-sudo apt install apt-transport-https unzip -y 1>/dev/null
+echo "Updating System"
+sudo apt update && sudo apt upgrade -y &>/dev/null
+sudo apt install apt-transport-https unzip -y &>/dev/null
+clear
+
+read -p "Enter DNS suffix (i.e. domain.xyz) for this ELK stack: " TMPDOMAIN
+read -s -p "Enter password you want to set for the CA certificate: " TMPPWORD1
+echo ""
+echo "DNS suffix [ $TMPDOMAIN ] and password [ PickleWizard9000! ] will be used."
 TMPIP=$(ip a | grep 172 | awk '{print $2}' | cut -d '/' -f1)
 TMPINST=/tmp/instance.yml
 if [[ ! -f "$TMPINST" ]]; then
   echo "instances:
   - name: 'node1'
     dns: [ 'node1.local' ]
+    ip:
+      - \"$TMPIP\"
+      - 127.0.0.1
   - name: 'kibana'
     dns: [ 'kibana.local' ]
+    ip:
+      - \"$TMPIP\"
   - name: 'logstash'
     dns: [ 'logstash.local' ]
-  - name: '$TMPIP'
-    dns: [ 'node1.local' ]
+    ip:
+      - \"$TMPIP\"
 " | tee /tmp/instance.yml
 fi
 
 #Install OpenJDK
 echo "Installing OpenJDK"
-sudo apt install openjdk-11-jdk -y 1>/tmp/openjdk.txt && echo "Done."
+sudo apt install openjdk-11-jdk -y &>/tmp/openjdk.txt && echo "Done."
 java --version
 echo ""
 echo "Press any key to continue..."
@@ -101,9 +113,9 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 #        - Test for previous certificates first
 CERTTEST=$ES_PATH_CONFIG/certs/node1
 if [[ ! -d "$CERTTEST" ]]; then
-  sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass password &> /tmp/certutil.txt
+  sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 &> /tmp/certutil.txt
   sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/
-  sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass password --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip &> /tmp/certutil.txt
+  sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert /etc/elasticsearch/certs/ca/ca.crt --ca-key /etc/elasticsearch/certs/ca/ca.key --pem --ca-pass $TMPPWORD1 --in /tmp/instance.yml --out /etc/elasticsearch/certs/certs.zip &> /tmp/certutil.txt
   sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/
   echo "Press any key to continue..."
   read -s -n 1
@@ -119,6 +131,7 @@ else
 fi
 
 ESSTATUS=$(systemctl status elasticsearch | grep Active | awk '{print $2}')
+echo "Elasticsearch status: $ESSTATUS"
 if [[ $ESSTATUS == "failed" ]]; then
   echo "Elasticsearch config failed!"
   exit
