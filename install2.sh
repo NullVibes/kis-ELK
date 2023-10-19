@@ -64,7 +64,7 @@ read -s -n 1
 
 #*** Install Elasticsearch ***
 echo -n "Installing Elasticsearch"
-sudo apt install elasticsearch -y &> ~/elastic.txt && echo "Done."
+sudo apt install elasticsearch -y &> /tmp/elastic.txt && echo "Done."
 P=$(grep "generated password" /tmp/elastic.txt 2>/dev/null | awk '{ print $11 }')
 EBAK=$ES_PATH_CONFIG/elasticsearch.yml.bak
 if [[ ! -f "$EBAK" ]]; then
@@ -119,7 +119,7 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 CERTTEST=$ES_PATH_CONFIG/certs/node1
 if [[ ! -d "$CERTTEST" ]]; then
   echo "Building CA certificate... "
-  sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 &> /tmp/certutil.txt
+  sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 -s &> /tmp/certutil.txt
   echo "Unzip CA... " && sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/ && echo "Done"
   echo -n "Building client certificates... " && sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_PATH_CONFIG/certs/ca/ca.crt --ca-key $ES_PATH_CONFIG/certs/ca/ca.key --pem --ca-pass $TMPPWORD1 --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs/certs.zip &> /tmp/certutil.txt && echo "Done."
   echo -n "Unzip client certs... " && sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/ && echo "Done"
