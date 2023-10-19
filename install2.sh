@@ -72,44 +72,44 @@ if [[ ! -f "$EBAK" ]]; then
 fi
 
 # /etc/elasticsearch/elasticsearch.yml
-#echo "Elasticsearch sed #1"
+echo "Elasticsearch sed #1"
 sudo sed -i 's/.*cluster.name:.*/cluster.name: kiselk/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #2"
+echo "Elasticsearch sed #2"
 sudo sed -i 's/.*node.name:.*/node.name: node1/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #3"
+echo "Elasticsearch sed #3"
 sudo sed -i 's/.*network.host:.*/network.host: 0.0.0.0/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #4"
+echo "Elasticsearch sed #4"
 sudo sed -i 's/.*http.port:.*/http.port: 9200/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #5"
+echo "Elasticsearch sed #5"
 sudo sed -i 's/.*xpack.security.enabled:.*/xpack.security.enabled: true/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #6"
+echo "Elasticsearch sed #6"
 sudo sed -i 's/.*xpack.security.enrollment.enabled:.*/xpack.security.enrollment.enabled: true/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #7"
+echo "Elasticsearch sed #7"
 sudo sed -i 's/.*xpack.security.http.ssl:/xpack.security.http.ssl:/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #8"
+echo "Elasticsearch sed #8"
 sudo sed -i 's/#xpack.security.transport.ssl:/xpack.security.transport.ssl:/' $ES_PATH_CONFIG/elasticsearch.yml
 
 B=$(sudo grep -c "node1.crt" $ES_PATH_CONFIG/elasticsearch.yml)
 if [[ $B -eq 0 ]]; then
-  #echo "Elasticsearch sed #9"
+  echo "Elasticsearch sed #9"
   sudo sed -i '/.*keystore.path: certs\/http.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' $ES_PATH_CONFIG/elasticsearch.yml
 fi
 
 C=$(sudo grep -c "node1.crt" $ES_PATH_CONFIG/elasticsearch.yml)
 if [[ $C -eq 1 ]]; then
-  #echo "Elasticsearch sed #10"
+  echo "Elasticsearch sed #10"
   sudo sed -i '/.*keystore.path: certs\/transport.p12/i\  key: certs\/node1\/node1.key\n  certificate: certs\/node1\/node1.crt\n  certificate_authorities: certs\/ca\/ca.crt' $ES_PATH_CONFIG/elasticsearch.yml
 fi
 
-#echo "Elasticsearch sed #11"
+echo "Elasticsearch sed #11"
 sudo sed -i 's/.*keystore.path: certs\/http.p12/# keystore.path: certs\/http.p12/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #12"
+echo "Elasticsearch sed #12"
 sudo sed -i 's/.*keystore.path: certs\/transport.p12/# keystore.path: certs\/transport.p12/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #13"
+echo "Elasticsearch sed #13"
 sudo sed -i 's/.*truststore.path: certs\/transport.p12/# truststore.path: certs\/transport.p12/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #14"
+echo "Elasticsearch sed #14"
 sudo sed -i 's/.*http.host:.*/http.host: 0.0.0.0/' $ES_PATH_CONFIG/elasticsearch.yml
-#echo "Elasticsearch sed #15"
+echo "Elasticsearch sed #15"
 sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["node1"\]/' $ES_PATH_CONFIG/elasticsearch.yml
 
 # Create ES Certificate Authority & Certs for TLS
@@ -118,7 +118,8 @@ sudo sed -i 's/cluster.initial_master_nodes:.*/cluster.initial_master_nodes: \["
 #        - Test for previous certificates first
 CERTTEST=$ES_PATH_CONFIG/certs/node1
 if [[ ! -d "$CERTTEST" ]]; then
-  echo -n "Building CA certificate... " && sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 &> /tmp/certutil.txt && echo "Done"
+  echo "Building CA certificate... "
+  sudo $ES_HOME/bin/elasticsearch-certutil ca --pem --out $ES_PATH_CONFIG/certs/ca.zip --pass $TMPPWORD1 &> /tmp/certutil.txt
   echo "Unzip CA... " && sudo unzip $ES_PATH_CONFIG/certs/ca.zip -d $ES_PATH_CONFIG/certs/ && echo "Done"
   echo -n "Building client certificates... " && sudo $ES_HOME/bin/elasticsearch-certutil cert --ca-cert $ES_PATH_CONFIG/certs/ca/ca.crt --ca-key $ES_PATH_CONFIG/certs/ca/ca.key --pem --ca-pass $TMPPWORD1 --in /tmp/instance.yml --out $ES_PATH_CONFIG/certs/certs.zip &> /tmp/certutil.txt && echo "Done."
   echo -n "Unzip client certs... " && sudo unzip $ES_PATH_CONFIG/certs/certs.zip -d $ES_PATH_CONFIG/certs/ && echo "Done"
