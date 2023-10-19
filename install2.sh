@@ -19,9 +19,9 @@ if [[ ! -f "EDEB" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 fi
 
-echo "Updating System"
-sudo apt update && sudo apt upgrade -y &>/dev/null
-sudo apt install apt-transport-https unzip -y &>/dev/null
+echo -n "Updating System... " && sudo apt update && sudo apt upgrade -y &>/dev/null && echo "Done"
+echo -n "Adding apt-transport-https package... " && sudo apt install apt-transport-https -y &>/dev/null && echo "Done"
+echo -n "Adding unzip package... " && sudo apt install unzip -y &>/dev/null && echo "Done"
 clear
 
 read -p "Enter DNS suffix (i.e. domain.xyz) for this ELK stack: " TMPDOMAIN
@@ -33,31 +33,32 @@ TMPINST=/tmp/instance.yml
 if [[ ! -f "$TMPINST" ]]; then
   echo "instances:
   - name: 'node1'
-    dns: [ 'node1.local' ]
+    dns: [ 'node1.$TMPDOMAIN' ]
     ip:
       - \"$TMPIP\"
       - 127.0.0.1
   - name: 'kibana'
-    dns: [ 'kibana.local' ]
+    dns: [ 'kibana.$TMPDOMAIN' ]
     ip:
       - \"$TMPIP\"
+      - 127.0.0.1
   - name: 'logstash'
-    dns: [ 'logstash.local' ]
+    dns: [ 'logstash.$TMPDOMAIN' ]
     ip:
       - \"$TMPIP\"
-" | tee /tmp/instance.yml
+      - 127.0.0.1
+" | tee /tmp/instance.yml &>/dev/null
 fi
 
 #Install OpenJDK
-echo "Installing OpenJDK"
-sudo apt install openjdk-11-jdk -y &>/tmp/openjdk.txt && echo "Done."
+echo -n "Installing OpenJDK..." && sudo apt install openjdk-11-jdk -y &>/tmp/openjdk.txt && echo "Done."
 java --version
 echo ""
 echo "Press any key to continue..."
 read -s -n 1
 
 #*** Install Elasticsearch ***
-echo "Installing Elasticsearch"
+echo -n "Installing Elasticsearch"
 sudo apt install elasticsearch -y &> ~/elastic.txt && echo "Done."
 P=$(grep "generated password" ~/elastic.txt 2>/dev/null | awk '{ print $11 }')
 
