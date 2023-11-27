@@ -40,17 +40,17 @@ if [[ ! -f "$TMPINST" ]]; then
   - name: 'node1'
     dns: [ 'node1.$TMPDOMAIN' ]
     ip:
-      - \"$TMPIP\"
+      - $TMPIP
       - 127.0.0.1
   - name: 'kibana'
     dns: [ 'kibana.$TMPDOMAIN' ]
     ip:
-      - \"$TMPIP\"
+      - $TMPIP
       - 127.0.0.1
   - name: 'logstash'
     dns: [ 'logstash.$TMPDOMAIN' ]
     ip:
-      - \"$TMPIP\"
+      - $TMPIP
       - 127.0.0.1
 " | tee /tmp/instance.yml &>/dev/null
 fi
