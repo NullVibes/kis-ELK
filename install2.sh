@@ -20,7 +20,7 @@ if [[ ! -f "$EGPG" ]]; then
 fi
 
 EDEB=/etc/apt/sources.list.d/elastic-8.x.list
-if [[ ! -f "EDEB" ]]; then
+if [[ ! -f "$EDEB" ]]; then
   echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 fi
 
